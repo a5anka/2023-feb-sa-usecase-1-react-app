@@ -1,6 +1,6 @@
 // import logo from './logo.svg';
 import React, { useEffect } from 'react';
-import { AuthProvider, useAuthContext } from "@asgardeo/auth-react";
+import { SecureRoute, AuthProvider, useAuthContext } from "@asgardeo/auth-react";
 import './App.css';
 import './App.scss';
 import { Nav, Navbar, Container } from 'react-bootstrap';
@@ -27,13 +27,13 @@ const RightLoginSignupMenu = () => {
   if (isLoggedIn) {
     menu = <>
       <Nav>
-        <Nav.Link href="#deets" onClick={ () => signOut()}>Logout</Nav.Link>
+        <Nav.Link href="#deets" onClick={() => signOut()}>Logout</Nav.Link>
         <Nav.Link href="#deets"><FontAwesomeIcon icon={faUser} /></Nav.Link></Nav>
     </>
   } else {
     menu = <>
       <Nav>
-        <Nav.Link href="#deets" onClick={ () => signIn() }>Login</Nav.Link>
+        <Nav.Link href="#deets" onClick={() => signIn()}>Login</Nav.Link>
         <Nav.Link href="#deets">Sign Up</Nav.Link></Nav>
     </>
   }
@@ -42,6 +42,9 @@ const RightLoginSignupMenu = () => {
 
 // Component to render the navigation bar
 const PetStoreNav = () => {
+  const { state, signIn, signOut } = useAuthContext();
+  let isLoggedIn = state.isAuthenticated;
+
   return (
     <>
       <Navbar bg="light" expand="lg">
@@ -62,6 +65,17 @@ const PetStoreNav = () => {
   );
 };
 
+const SecureRedirect = (props) => {
+  const { component, path } = props;
+  const { signIn } = useAuthContext();
+
+  const callback = () => {
+    signIn();
+  };
+
+  return (<SecureRoute exact path={path} component={component} callback={callback} />);
+};
+
 // Main app component
 const App = () => {
   useEffect(() => {
@@ -78,8 +92,8 @@ const App = () => {
       <PetStoreNav />
       <BrowserRouter>
         <Switch>
-          <Route path="/mycart" component={MyCart} />
-          <Route path="/admin" component={Admin} />
+          <SecureRedirect exact path="/mycart" component={MyCart} />
+          <SecureRedirect exact path="/admin" component={Admin} />
           <Route path="/" component={Catalog} />
         </Switch>
       </BrowserRouter>
