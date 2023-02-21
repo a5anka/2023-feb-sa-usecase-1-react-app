@@ -27,7 +27,7 @@ const RightLoginSignupMenu = () => {
   if (isLoggedIn) {
     menu = <>
       <Nav>
-        <Nav.Link href="#deets">Logout</Nav.Link>
+        <Nav.Link href="#deets" onClick={ () => signOut()}>Logout</Nav.Link>
         <Nav.Link href="#deets"><FontAwesomeIcon icon={faUser} /></Nav.Link></Nav>
     </>
   } else {
