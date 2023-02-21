@@ -78,9 +78,9 @@ const App = () => {
       <PetStoreNav />
       <BrowserRouter>
         <Switch>
-          <Route path="/" component={Catalog} />
           <Route path="/mycart" component={MyCart} />
           <Route path="/admin" component={Admin} />
+          <Route path="/" component={Catalog} />
         </Switch>
       </BrowserRouter>
     </AuthProvider>
