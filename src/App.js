@@ -1,6 +1,6 @@
 // import logo from './logo.svg';
 import React, { useState, useEffect } from 'react';
-import { SecureRoute, useAuthContext } from "@asgardeo/auth-react";
+import { useAuthContext } from "@asgardeo/auth-react";
 import ApolloClient from 'apollo-boost';
 import { ApolloProvider } from '@apollo/react-hooks';
 import './App.css';
@@ -44,6 +44,21 @@ const RightLoginSignupMenu = () => {
 
 // Component to render the navigation bar
 const PetStoreNav = () => {
+  const [isAdmin, setIsAdmin] = useState(null);
+  const { getDecodedIDToken } = useAuthContext();
+
+  useEffect(() => {
+    getDecodedIDToken().then((response) => {
+      console.log(response.groups);
+      if (response.groups.includes("admin")) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    }).catch((error) => {
+      //console.error(error);
+    });
+  });
   return (
     <>
       <Navbar bg="light" expand="lg">
@@ -54,7 +69,7 @@ const PetStoreNav = () => {
             <Nav className="me-auto">
               <Nav.Link href="/">Catalog</Nav.Link>
               <Nav.Link href="/mycart">My Cart</Nav.Link>
-              <Nav.Link href="/admin">Admin</Nav.Link>
+              {isAdmin ? <Nav.Link href="/admin">Admin</Nav.Link>: null}
             </Nav>
           </Navbar.Collapse>
           <RightLoginSignupMenu />
@@ -64,22 +79,13 @@ const PetStoreNav = () => {
   );
 };
 
-const SecureRedirect = (props) => {
-  const { component, path } = props;
-  const { signIn } = useAuthContext();
-
-  const callback = () => {
-    signIn();
-  };
-
-  return (<SecureRoute exact path={path} component={component} callback={callback} />);
-};
-
 // Main app component
 const App = () => {
   const [idToken, setIdToken] = useState(null);
   const { state, getAccessToken } = useAuthContext();
   const { isLoading } = state;
+
+  //console.log(state.allowedScopes);
 
   useEffect(() => {
     document.title = 'PetStore';
@@ -109,8 +115,8 @@ const App = () => {
       <PetStoreNav />
       <BrowserRouter>
         <Switch>
-          <SecureRedirect exact path="/mycart" component={MyCart} />
-          <SecureRedirect exact path="/admin" component={Admin} />
+          <Route path="/mycart" component={MyCart} />
+          <Route path="/admin" component={Admin} />
           <Route path="/" component={Catalog} />
         </Switch>
       </BrowserRouter>

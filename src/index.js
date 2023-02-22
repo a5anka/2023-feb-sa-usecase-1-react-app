@@ -18,8 +18,8 @@ root.render(
         signOutRedirectURL: "http://localhost:3000",
         clientID: "DHqsrMxSMeomoWh0LWs2vjg0TRsa",
         baseUrl: "https://api.asgardeo.io/t/asanka2023febsahackathon",
-        scope: ["openid", "profile"],
-        "storage": "sessionStorage"
+        scope: ["openid", "profile", "groups"],
+        storage: "sessionStorage",
       }}>
         <SecureApp 
             fallback={ <div>Loading...</div> }
