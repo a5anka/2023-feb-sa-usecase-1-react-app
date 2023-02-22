@@ -85,7 +85,7 @@ const App = () => {
     <AuthProvider config={{
       signInRedirectURL: "http://localhost:3000",
       signOutRedirectURL: "http://localhost:3000",
-      clientID: "OSTKXaC1NmXV0oYFIoFkZ7yOLWga",
+      clientID: "DHqsrMxSMeomoWh0LWs2vjg0TRsa",
       baseUrl: "https://api.asgardeo.io/t/asanka2023febsahackathon",
       scope: ["openid", "profile"]
     }}>
