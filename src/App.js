@@ -49,27 +49,28 @@ const PetStoreNav = () => {
 
   useEffect(() => {
     getDecodedIDToken().then((response) => {
-      console.log(response.groups);
-      if (response.groups.includes("admin")) {
+      if (response.groups === undefined) {
+        setIsAdmin(false);
+      } else if (response.groups.includes("admin")) {
         setIsAdmin(true);
       } else {
         setIsAdmin(false);
       }
     }).catch((error) => {
-      //console.error(error);
+      console.error(error);
     });
   });
   return (
     <>
       <Navbar bg="light" expand="lg">
         <Container>
-          <Navbar.Brand href="#home">PetStore</Navbar.Brand>
+          <Navbar.Brand href="/">PetStore</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="/">Catalog</Nav.Link>
+              <Nav.Link href="/catalog">Catalog</Nav.Link>
               <Nav.Link href="/mycart">My Cart</Nav.Link>
-              {isAdmin ? <Nav.Link href="/admin">Admin</Nav.Link>: null}
+              {isAdmin ? <Nav.Link href="/admin">Admin</Nav.Link> : null}
             </Nav>
           </Navbar.Collapse>
           <RightLoginSignupMenu />
@@ -82,7 +83,8 @@ const PetStoreNav = () => {
 // Main app component
 const App = () => {
   const [idToken, setIdToken] = useState(null);
-  const { state, getAccessToken } = useAuthContext();
+  const [isAdmin, setIsAdmin] = useState(null);
+  const { state, getAccessToken, getDecodedIDToken } = useAuthContext();
   const { isLoading } = state;
 
   //console.log(state.allowedScopes);
@@ -95,11 +97,23 @@ const App = () => {
         setIdToken(decodedIdToken);
       }).catch((error) => {
         console.log(error);
-      })
+      });
+
+    getDecodedIDToken().then((response) => {
+      if (response.groups === undefined) {
+        setIsAdmin(false);
+      } else if (response.groups.includes("admin")) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+    }).catch((error) => {
+      console.error(error);
+    });
   });
 
 
-  if (isLoading || !idToken) {
+  if (isLoading || !idToken || isAdmin === null) {
     return <h1>Loading</h1>;
   }
 
@@ -117,7 +131,8 @@ const App = () => {
         <Switch>
           <Route path="/mycart" component={MyCart} />
           <Route path="/admin" component={Admin} />
-          <Route path="/" component={Catalog} />
+          <Route path="/catalog" component={Catalog} />
+          {isAdmin ? <Route path="/" component={Admin} /> : <Route path="/" component={Catalog} />}
         </Switch>
       </BrowserRouter>
     </ApolloProvider>
