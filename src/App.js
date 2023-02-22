@@ -8,7 +8,7 @@ import './App.scss';
 import { Nav, Navbar, Container } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom';
 
 import Catalog from './components/Catalog/Catalog.js';
 import MyCart from './components/MyCart/Cart.js';
@@ -68,9 +68,9 @@ const PetStoreNav = () => {
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-              <Nav.Link href="/catalog">Catalog</Nav.Link>
-              <Nav.Link href="/mycart">My Cart</Nav.Link>
-              {isAdmin ? <Nav.Link href="/admin">Admin</Nav.Link> : null}
+              <Link to="/catalog" className="nav-link">Catalog</Link>
+              <Link to="/mycart" className="nav-link">My Cart</Link>
+              {isAdmin ? <Link to="/admin" className="nav-link">Admin</Link> : null}
             </Nav>
           </Navbar.Collapse>
           <RightLoginSignupMenu />
@@ -126,8 +126,8 @@ const App = () => {
 
   return (
     <ApolloProvider client={client}>
-      <PetStoreNav />
       <BrowserRouter>
+        <PetStoreNav />
         <Switch>
           <Route path="/mycart" component={MyCart} />
           <Route path="/admin" component={Admin} />
