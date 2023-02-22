@@ -1,6 +1,8 @@
 // import logo from './logo.svg';
-import React, { useEffect } from 'react';
-import { SecureRoute, AuthProvider, useAuthContext } from "@asgardeo/auth-react";
+import React, { useState, useEffect } from 'react';
+import { SecureRoute, useAuthContext } from "@asgardeo/auth-react";
+import ApolloClient from 'apollo-boost';
+import { ApolloProvider } from '@apollo/react-hooks';
 import './App.css';
 import './App.scss';
 import { Nav, Navbar, Container } from 'react-bootstrap';
@@ -42,9 +44,6 @@ const RightLoginSignupMenu = () => {
 
 // Component to render the navigation bar
 const PetStoreNav = () => {
-  const { state, signIn, signOut } = useAuthContext();
-  let isLoggedIn = state.isAuthenticated;
-
   return (
     <>
       <Navbar bg="light" expand="lg">
@@ -78,17 +77,35 @@ const SecureRedirect = (props) => {
 
 // Main app component
 const App = () => {
+  const [idToken, setIdToken] = useState(null);
+  const { state, getAccessToken } = useAuthContext();
+  const { isLoading } = state;
+
   useEffect(() => {
     document.title = 'PetStore';
-  }, []);
+
+    getAccessToken()
+      .then((decodedIdToken) => {
+        setIdToken(decodedIdToken);
+      }).catch((error) => {
+        console.log(error);
+      })
+  });
+
+
+  if (isLoading || !idToken) {
+    return <h1>Loading</h1>;
+  }
+
+  const client = new ApolloClient({
+    uri: 'https://2c224c5f-1658-4835-8e36-e39a787ada3c-dev.e1-us-east-azure.choreoapis.dev/cqge/item-service/1.0.0/graphql',
+    headers: {
+      authorization: 'Bearer ' + idToken,
+    },
+  });
+
   return (
-    <AuthProvider config={{
-      signInRedirectURL: "http://localhost:3000",
-      signOutRedirectURL: "http://localhost:3000",
-      clientID: "DHqsrMxSMeomoWh0LWs2vjg0TRsa",
-      baseUrl: "https://api.asgardeo.io/t/asanka2023febsahackathon",
-      scope: ["openid", "profile"]
-    }}>
+    <ApolloProvider client={client}>
       <PetStoreNav />
       <BrowserRouter>
         <Switch>
@@ -97,7 +114,7 @@ const App = () => {
           <Route path="/" component={Catalog} />
         </Switch>
       </BrowserRouter>
-    </AuthProvider>
+    </ApolloProvider>
   );
 }
 
