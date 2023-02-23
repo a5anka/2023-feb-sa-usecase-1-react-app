@@ -1,19 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Button, Table } from 'react-bootstrap';
+import { useAuthContext } from "@asgardeo/auth-react";
 import EditButton from './EditButton';
 
 export default function Admin() {
+    const { httpRequest } = useAuthContext();
     const [showEditModal, setShowEditModal] = useState(false);
+    const [items, setItems] = useState(null); // [
     const [itemToEdit, setItemToEdit] = useState(null);
+
+    const requestConfig = {
+        method: "GET",
+        url: "https://2c224c5f-1658-4835-8e36-e39a787ada3c-dev.e1-us-east-azure.choreoapis.dev/cqge/admin-service/1.0.0/items"
+    };
 
     const handleEdit = (item) => {
         setItemToEdit(item);
         setShowEditModal(true);
-      };
+    };
 
     useEffect(() => {
         document.title = "Admin | PetStore"
-    }, []);
+
+        // Fetch items from API
+        httpRequest(requestConfig)
+            .then((response) => {
+                console.log(response);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    });
 
     // Initialize an item object
     const item = {
