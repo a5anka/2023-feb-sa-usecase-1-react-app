@@ -1,48 +1,61 @@
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Container, Button, Table } from 'react-bootstrap';
 import { useAuthContext } from "@asgardeo/auth-react";
 import EditButton from './EditButton';
+import LoadingSpinner from '../LoadingSpinner';
 
 export default function Admin() {
-    const { httpRequest } = useAuthContext();
-    const [showEditModal, setShowEditModal] = useState(false);
-    const [items, setItems] = useState(null); // [
-    const [itemToEdit, setItemToEdit] = useState(null);
-
-    const requestConfig = {
-        method: "GET",
-        url: "https://2c224c5f-1658-4835-8e36-e39a787ada3c-dev.e1-us-east-azure.choreoapis.dev/cqge/admin-service/1.0.0/items"
-    };
-
-    const handleEdit = (item) => {
-        setItemToEdit(item);
-        setShowEditModal(true);
-    };
+    const { getAccessToken } = useAuthContext();
+    const [items, setItems] = useState(null); 
 
     useEffect(() => {
         document.title = "Admin | PetStore"
 
-        // Fetch items from API
-        httpRequest(requestConfig)
-            .then((response) => {
-                console.log(response);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    });
+        getAccessToken()
+            .then((decodedIdToken) => {
+                const endpoint = 'https://2c224c5f-1658-4835-8e36-e39a787ada3c-dev.e1-us-east-azure.choreoapis.dev/cqge/admin-service/1.0.0/';
 
-    // Initialize an item object
-    const item = {
-        id: 1,
-        title: "Top Paw® Valentine's Day Single Dog Sweater",
-        description: "Dress your pup up appropriately for the holiday with the Top Paw® Valentine's Day Single Dog Sweater. This cute and cozy sweater features a red heart on the back and a red bow on the front. It's made of soft, comfortable cotton and polyester, and it's machine washable for easy care. Only at PetSmart.",
-        includes: "1 Sweater",
-        intendedFor: "Dogs",
-        color: "Red, White, Black",
-        material: "100% Acrylic",
-        price: 9.99
-    };
+                const axiosInstance = axios.create({
+                    baseURL: endpoint,
+                    headers: {
+                        Authorization: `Bearer ${decodedIdToken}`,
+                    },
+                });
+
+                axiosInstance
+                    .get('/items')
+                    .then((response) => {
+                        // Handle the response data
+                        setItems(response.data);
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+            }).catch((error) => {
+                console.log(error);
+            });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    if (items === null) {
+        return (
+            <LoadingSpinner />
+        );
+    }
+
+    const listItems = items.map((item) =>
+        <tr className="align-middle" key={item.id}>
+            <td>{item.title}</td>
+            <td>{item.description} </td>
+            <td>{item.includes}</td>
+            <td>{item.intendedFor}</td>
+            <td>{item.color}</td>
+            <td>{item.material}</td>
+            <td>${item.price}</td>
+            <td><EditButton item={item} />&nbsp;<Button variant="danger" size="sm">Delete</Button></td>
+        </tr>
+    );
 
     return (
         <>
@@ -59,36 +72,7 @@ export default function Admin() {
                             <th scope="col">Price</th>
                             <th scope="col">&nbsp;</th>
                         </tr>
-                        <tr className="align-middle">
-                            <td>Top Paw® Valentine's Day Single Dog Sweater</td>
-                            <td>Top Paw® Valentine's Day Single Dog Sweater is a cute and cozy way to show your dog some love this Valentine's Day. This sweater features a red heart on the back and a red bow on the front. It's made of soft, comfortable cotton and polyester blend fabric. It's machine washable for easy care. This sweater is available in sizes XS, S, M, L, XL and XXL... </td>
-                            <td>1 Sweater</td>
-                            <td>Dogs</td>
-                            <td>Red, White, Black</td>
-                            <td>100% Acrylic</td>
-                            <td>$14.99</td>
-                            <td><EditButton item={item} />&nbsp;<Button variant="danger" size="sm">Delete</Button></td>
-                        </tr>
-                        <tr className="align-middle">
-                            <td>Top Paw® Valentine's Day Single Dog Sweater</td>
-                            <td>Top Paw® Valentine's Day Single Dog Sweater is a cute and cozy way to show your dog some love this Valentine's Day. This sweater features a red heart on the back and a red bow on the front. It's made of soft, comfortable cotton and polyester blend fabric. It's machine washable for easy care. This sweater is available in sizes XS, S, M, L, XL and XXL... </td>
-                            <td>1 Sweater</td>
-                            <td>Dogs</td>
-                            <td>Red, White, Black</td>
-                            <td>100% Acrylic</td>
-                            <td>$14.99</td>
-                            <td><Button variant="primary" size="sm">Edit</Button>&nbsp;<Button variant="danger" size="sm">Delete</Button></td>
-                        </tr>
-                        <tr className="align-middle">
-                            <td>Top Paw® Valentine's Day Single Dog Sweater</td>
-                            <td>Top Paw® Valentine's Day Single Dog Sweater is a cute and cozy way to show your dog some love this Valentine's Day. This sweater features a red heart on the back and a red bow on the front. It's made of soft, comfortable cotton and polyester blend fabric. It's machine washable for easy care. This sweater is available in sizes XS, S, M, L, XL and XXL... </td>
-                            <td>1 Sweater</td>
-                            <td>Dogs</td>
-                            <td>Red, White, Black</td>
-                            <td>100% Acrylic</td>
-                            <td>$14.99</td>
-                            <td><Button variant="primary" size="sm">Edit</Button>&nbsp;<Button variant="danger" size="sm">Delete</Button></td>
-                        </tr>
+                        {listItems}
                         <tr className="text-end">
                             <td colSpan="8"><Button variant="primary" className="float-right">Add New Product</Button></td>
                         </tr>
