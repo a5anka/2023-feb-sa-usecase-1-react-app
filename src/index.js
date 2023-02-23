@@ -15,8 +15,8 @@ root.render(
     <script src="https://cdn.jsdelivr.net/npm/react-bootstrap@next/dist/react-bootstrap.min.js" crossOrigin="true"></script>
 
     <AuthProvider config={{
-      signInRedirectURL: "https://2023-feb-sa-usecase-1-react-app.vercel.app/",
-      signOutRedirectURL: "https://2023-feb-sa-usecase-1-react-app.vercel.app/",
+      signInRedirectURL: "https://2023-feb-sa-usecase-1-react-app.vercel.app",
+      signOutRedirectURL: "https://2023-feb-sa-usecase-1-react-app.vercel.app",
       clientID: "DHqsrMxSMeomoWh0LWs2vjg0TRsa",
       baseUrl: "https://api.asgardeo.io/t/asanka2023febsahackathon",
       scope: ["openid", "profile", "groups"],
